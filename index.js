@@ -1,6 +1,5 @@
 import express, { json } from 'express';
 const app = express();
-import api from './api.js';
 import createIssue from './api.js';
 
 
@@ -18,6 +17,11 @@ app.post('/webhook', json({type: 'application/json'}), async (req, res) => {
   const githubEvent = req.headers['x-github-event'];
   const securityEvents = ['dependabot_alert', 'code_scanning_alert', 'secret_scanning_alert']
 
+  // Log all incoming events for debugging
+  console.log(`Received GitHub event: ${githubEvent}`);
+  console.log(`Request body keys:`, Object.keys(req.body));
+  console.log(`Action (if present):`, req.body?.action);
+
   // You should add logic to handle each event type that your webhook is subscribed to.
   // For example, this code handles the `issues` and `ping` events.
   //
@@ -30,16 +34,26 @@ app.post('/webhook', json({type: 'application/json'}), async (req, res) => {
   if (githubEvent === 'dependabot_alert') {
     const data = req.body;
     const action = data.action;
-    // console.log('data:', data)
+    console.log('Data.Action:', action);
+    
+    console.log('=== Dependabot Alert Event ===');
+    // console.log('Action:', action);
+    // console.log('Alert data:', JSON.stringify(data.alert, null, 2));
+    // console.log('Repository:', data.repository?.name);
+    // console.log('Owner:', data.repository?.owner?.login);
 
-    if (action === 'created' || action === 'appeared_in_branch' || action === 'auto_reopened') {
+    if (action === 'created' || action === 'appeared_in_branch' || action === 'auto_reopened' || action === 'reopened') {
       const owner = data.repository.owner.login;
       const repo = data.repository.name;
-      const title = data.alert.security_advisory.cve_id;
-      let body = data.alert.security_advisory.summary + '\n' + data.url;
+      const title = data.alert.security_advisory.cve_id || `Security Alert: ${data.alert.security_vulnerability.package.name}`;
+      let body = `**Security Advisory**: ${data.alert.security_advisory.summary}\n\n**Alert URL**: ${data.alert.html_url}\n\n**Package**: ${data.alert.security_vulnerability.package.name}\n**Severity**: ${data.alert.security_advisory.severity}`;
       
-      const newIssue = await createIssue(owner, repo, title, body);
-      console.log(`An issue was created and assigned to Copilot with this title: ${newIssue.title}`);
+      try {
+        const newIssue = await createIssue(owner, repo, title, body);
+        console.log(`An issue was created with this title: ${newIssue.title}`);
+      } catch (error) {
+        console.error('Failed to create GitHub issue:', error.message);
+      }
     }
   } else if (githubEvent === 'ping') {
     console.log('GitHub sent the ping event');
