@@ -46,7 +46,9 @@ app.post('/webhook', json({type: 'application/json'}), async (req, res) => {
       const owner = data.repository.owner.login;
       const repo = data.repository.name;
       const title = data.alert.security_advisory.cve_id || `Security Alert: ${data.alert.security_vulnerability.package.name}`;
-      let body = `**Security Advisory**: ${data.alert.security_advisory.summary}\n\n**Alert URL**: ${data.alert.html_url}\n\n**Package**: ${data.alert.security_vulnerability.package.name}\n**Severity**: ${data.alert.security_advisory.severity}`;
+      
+      const prompt = 'Write a Jira ticket for the Dependabot Issue details below. In the ticket, include any context a developer needs to remediate the Dependabot Issue.';
+      let body = `${prompt}\n\n**Security Advisory**: ${data.alert.security_advisory.summary}\n\n**Alert URL**: ${data.alert.html_url}\n\n**Package**: ${data.alert.security_vulnerability.package.name}\n**Severity**: ${data.alert.security_advisory.severity}`;
       
       try {
         const newIssue = await createIssue(owner, repo, title, body);
