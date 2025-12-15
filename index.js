@@ -47,7 +47,7 @@ app.post('/webhook', json({type: 'application/json'}), async (req, res) => {
       const repo = data.repository.name;
       const title = data.alert.security_advisory.cve_id || `Security Alert: ${data.alert.security_vulnerability.package.name}`;
       
-      const prompt = 'If the `jira_create_issue` tool is not available, immediately terminate the process. If an issue for the Dependabot Issue exists, immediately terminate the process. Write a Jira ticket for the Dependabot Issue details below. In the ticket, include any context a developer needs to remediate the Dependabot Issue.';
+      const prompt = 'If the `jira_create_issue` tool is not available, immediately terminate the process. The only Jira Project in-scope is *Custom Software* with id *CS*. If an Jira ticket for the Dependabot Issue exists, immediately terminate the process. Write a Jira ticket for the Dependabot Issue details below. In the ticket, include any context a developer needs to remediate the Dependabot Issue.';
       let body = `${prompt}\n\n**Security Advisory**: ${data.alert.security_advisory.summary}\n\n**Alert URL**: ${data.alert.html_url}\n\n**Package**: ${data.alert.security_vulnerability.package.name}\n**Severity**: ${data.alert.security_advisory.severity}`;
       
       try {
