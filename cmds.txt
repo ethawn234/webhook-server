@@ -1,3 +1,5 @@
 
 To receive forwarded webhooks from smee.io, run the following command in your terminal. Replace WEBHOOK_PROXY_URL with your webhook proxy URL from earlier.
 smee --url https://smee.io/DfeMFCmvOFE8wM7z --path /webhook --port 3000
+
+gh api repos/ethawn234/webhook-server/hooks --method GET

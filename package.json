@@ -16,6 +16,7 @@
     "express": "^5.1.0",
     "nodemon": "^3.1.10",
     "octokit": "^5.0.3",
-    "smee-client": "^4.3.1"
+    "smee-client": "^4.3.1",
+    "js-yaml": "4.1.0"
   }
 }
